@@ -1,0 +1,22 @@
+{
+  "name": "relationshipbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "An0",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "dblapi.js": "^2.4.0",
+    "discord.js": "^13.2.0",
+    "erlpack": "github:discordapp/erlpack",
+    "graphviz": "0.0.9",
+    "mongoose": "^5.9.11",
+    "mongoose-long": "^0.2.1",
+    "node-fetch": "^2.6.0",
+    "sharp": "^0.25.2",
+    "yauzl-promise": "^2.1.3"
+  }
+}
