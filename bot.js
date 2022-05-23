@@ -1772,7 +1772,7 @@ async function restartBot() {
 	LogError("Restarting bot...");
 	await DiscordClient.destroy();
 	await DiscordClient.login(Config.TOKEN);
-	Log("Bot restarted");
+	LogError("Bot restarted");
 }
 
 // If detect ratelimit, ignore it
