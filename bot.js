@@ -1767,5 +1767,30 @@ Fs.readdir("graphs").then(files => files.map(filename => Fs.unlink(`graphs/${fil
 const dbl = new (require('dblapi.js'))(Config.DBLTOKEN, DiscordClient);
 DiscordClient.login(Config.TOKEN);
 
+// Restart function
+async function restartBot() {
+	LogError("Restarting bot...");
+	await DiscordClient.destroy();
+	await DiscordClient.login(Config.TOKEN);
+	Log("Bot restarted");
+}
+
+// If detect ratelimit, ignore it
+DiscordClient.on('rateLimit', (rateLimitInfo) => {
+	LogError(`Ratelimit hit: ${rateLimitInfo.path}, retry after ${rateLimitInfo.timeout}ms`);
+});
+
+// If a shard times out, retry the shard
+DiscordClient.on('shardDisconnect', (event) => {
+	LogError(`Shard ${event.shard.id} disconnected: ${event.reason}`);
+	setTimeout(() => {
+		restartBot();
+	}, 5000);
+});
+
+// if sharding still in progress, ignore
+DiscordClient.on('shardPreReady', (event) => {
+	LogError(`Shard preready: ${event.shard.id}`);
+});
 
 })();
