@@ -17,7 +17,7 @@
     makeCache: Discord.Options.cacheWithLimits({
       MessageManager: {
         sweepInterval: 2111,
-        sweepFilter: Discord.LimitedCollection.filterByLifetime({
+        sweepFilter: Discord.Sweepers.filterByLifetime({
           lifetime: 31 * 60,
           getComparisonTimestamp: (e) => e.editedTimestamp ?? e.createdTimestamp,
         }),
@@ -889,7 +889,9 @@
       graphviz.on('exit', async (code) => {
         if (code !== 0) {
           LogError({ 'GRAPHVIZ ERROR': graphvizError });
-          //////TODO handle error
+          await Reply(message, 'There was an error rendering the graph');
+          FreeRenderSlot(slot);
+          return;
         } else {
           if (delayNotification != null) {
             try {
@@ -979,7 +981,8 @@
               let avatar = await (await fetch(user.displayAvatarURL({ size: 256 }))).buffer();
               avatars.push([user, avatar]);
             } catch (err) {
-              //TODO
+              LogError(err);
+              await Reply(message, "There was an error fetching one of the mentioned users' avatars");
             }
             CdnDownloadSemaphoreRelease();
           })
@@ -1008,7 +1011,8 @@
                 let avatar = await (await fetch(user.displayAvatarURL({ size: 256 }))).buffer();
                 avatars.push([user, avatar]);
               } catch (err) {
-                //TODO
+                LogError(err);
+                await Reply(message, "There was an error fetching one of the mentioned users' avatars");
               }
               CdnDownloadSemaphoreRelease();
             })
@@ -1749,7 +1753,11 @@
         DeleteRelationshipRequest(message.id);
       }
     } else {
-      if (user.id !== request.for) return; //TODO clear spam reactions
+      // Clear spam reactions
+      if (user.id !== request.for) {
+        reaction.remove().catch(LogError);
+        return;
+      }
 
       let emojiName = reaction.emoji.name;
       if (emojiName === YesEmoji) {
