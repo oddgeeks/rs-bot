@@ -8,6 +8,7 @@ services:
     env:
       - TOKEN=${TOKEN}
       - DBLTOKEN=${DBLTOKEN}
+      - GRAPHVIZ=${GRAPHVIZ}
   mongodb:
     image: mongo
     container_name: mongodb
@@ -18,5 +19,5 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
-      - MONGO_INITDB_DATABASE=relationship-bot
+      - MONGO_INITDB_DATABASE=relationships
     restart: always

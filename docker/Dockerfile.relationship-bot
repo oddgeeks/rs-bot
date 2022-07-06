@@ -6,4 +6,6 @@ RUN npm install
 
 RUN npm install -g pm2
 
+RUN sudo apt install graphviz
+
 CMD ["pm2-runtime", "index.js"]
