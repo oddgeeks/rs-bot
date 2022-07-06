@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile.relationship-bot
+    env:
+      - TOKEN=${TOKEN}
+      - DBLTOKEN=${DBLTOKEN}
   mongodb:
     image: mongo
     container_name: mongodb
