@@ -9,6 +9,7 @@ services:
       - TOKEN=${TOKEN}
       - DBLTOKEN=${DBLTOKEN}
       - GRAPHVIZ=${GRAPHVIZ}
+      - ERRORCHANNEL=${ERRORCHANNEL}
   mongodb:
     image: mongo
     container_name: mongodb
