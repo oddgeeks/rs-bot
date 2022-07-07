@@ -5,11 +5,13 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile.relationship-bot
-    env:
+    environment:
       - TOKEN=${TOKEN}
       - DBLTOKEN=${DBLTOKEN}
       - GRAPHVIZ=${GRAPHVIZ}
       - ERRORCHANNEL=${ERRORCHANNEL}
+    networks:
+      - relationshipbot-network
   mongodb:
     image: mongo
     container_name: mongodb
@@ -22,3 +24,9 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=root
       - MONGO_INITDB_DATABASE=relationships
     restart: always
+    networks:
+      - relationshipbot-network
+
+networks:
+  relationshipbot-network:
+    driver: bridge
