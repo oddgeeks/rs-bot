@@ -15,6 +15,7 @@ services:
   mongodb:
     image: mongo
     container_name: mongodb
+    hostname: mongodb.relationshipbot.local
     ports:
       - "27017:27017"
     volumes:
