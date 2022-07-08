@@ -12,9 +12,9 @@ services:
       - ERRORCHANNEL=${ERRORCHANNEL}
     networks:
       - relationshipbot-network
-  mongodb:
+  relationship-bot-mongodb:
     image: mongo
-    container_name: mongodb
+    container_name: relationship-bot-mongodb
     hostname: mongodb.relationshipbot.local
     ports:
       - "27017:27017"
