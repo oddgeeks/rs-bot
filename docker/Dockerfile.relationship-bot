@@ -12,6 +12,8 @@ RUN apt install python3 -y
 
 RUN apt install make -y
 
+RUN apt install gcc -y
+
 RUN npm install
 
 RUN npm install -g pm2
