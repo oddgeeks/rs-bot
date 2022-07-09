@@ -19,7 +19,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - /var/lib/mongodb:/data/db
+      - ./data/mongo:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
