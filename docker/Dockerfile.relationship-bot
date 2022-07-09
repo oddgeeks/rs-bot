@@ -1,5 +1,7 @@
 FROM node:current-buster-slim
 
+WORKDIR /relationship-bot
+
 COPY . .
 
 RUN npm install
