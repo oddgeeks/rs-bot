@@ -1800,9 +1800,15 @@
     LogError('Bot restarted');
   }
 
-  // If detect ratelimit, ignore it
+  // If detect Discord ratelimit global error, wait for a while and restart the bot
   DiscordClient.on('rateLimit', (rateLimitInfo) => {
-    LogError(`Ratelimit hit: ${rateLimitInfo.path}, retry after ${rateLimitInfo.timeout}ms`);
+    if (rateLimitInfo.global) {
+      LogError('Global ratelimit detected, waiting for a while and restarting bot...');
+      setTimeout(restartBot, 60000);
+    }
+    else {
+      LogError(`Ratelimit hit: ${rateLimitInfo.path}, retry after ${rateLimitInfo.timeout}ms`);
+    }
   });
 
   // If a shard times out, retry the shard

@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 services:
   relationship-bot:
     container_name: relationship-bot
@@ -17,7 +17,7 @@ services:
     container_name: relationship-bot-mongodb
     hostname: mongodb.relationshipbot.local
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - ./data/mongo:/data/db
     environment:
