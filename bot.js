@@ -93,6 +93,7 @@
   DiscordClient.on('ready', async () => {
     Me = DiscordClient.user;
     console.log(`Logged in as ${Me.tag}!`);
+    DiscordClient.user.setActivity('Use r:help to find out more.', { type: 'WATCHING' });
     Shard = DiscordClient.shard;
     ShardIdPrefix = `${Shard.ids[0].toString(32)}:`;
     if (process.env.ERRORCHANNEL) {
