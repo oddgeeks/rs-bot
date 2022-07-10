@@ -1805,8 +1805,7 @@
     if (rateLimitInfo.global) {
       LogError('Global ratelimit detected, waiting for a while and restarting bot...');
       setTimeout(restartBot, 60000);
-    }
-    else {
+    } else {
       LogError(`Ratelimit hit: ${rateLimitInfo.path}, retry after ${rateLimitInfo.timeout}ms`);
     }
   });

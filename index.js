@@ -43,10 +43,13 @@ function TakeRenderSlot(premium) {
   return [slotType, reply];
 }
 function FreeRenderSlot(slot) {
-  if (slot === 1) {
-    FreeRenderSlotsUsed--;
-  } else if (slot === 2) {
-    PremiumRenderSlotsUsed--;
+  switch (slot) {
+    case 1:
+      FreeRenderSlotsUsed--;
+      break;
+    case 2:
+      PremiumRenderSlotsUsed--;
+      break;
   }
 }
 
