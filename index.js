@@ -7,13 +7,13 @@ const manager = new ShardingManager('./bot.js', {
 
 const Prefix = 'r:'; //just for output
 
-var FreeRenderSlotsUsed = 0;
-var PremiumRenderSlotsUsed = 0;
+let FreeRenderSlotsUsed = 0;
+let PremiumRenderSlotsUsed = 0;
 const FreeRenderSlots = 5;
 const PremiumRenderSlots = 10;
 const CdnDownloadSlots = 20;
 
-var CdnDownloadSemaphore = Semaphore(CdnDownloadSlots);
+const CdnDownloadSemaphore = Semaphore(CdnDownloadSlots);
 
 const CdnDownloadSemaphoreWait = () => CdnDownloadSemaphore.Wait();
 const CdnDownloadSemaphoreRelease = () => CdnDownloadSemaphore.Release();
@@ -82,4 +82,4 @@ manager.on('shardCreate', (shard) => {
   console.log(`Launched shard ${shard.id}`);
   shard.on('message', (message) => ShardMessage(shard, message));
 });
-manager.spawn();
+manager.spawn().then(r => console.log(`Launched ${r.length} shards`));
