@@ -1,4 +1,5 @@
 (async () => {
+  let StatisticsChanged;
   require('dotenv').config();
   const Graphviz = require('graphviz');
   const Fs = require('fs').promises;
@@ -33,8 +34,8 @@
     useCreateIndex: true,
   });
 
-  var PremiumGuilds = new Map(Object.entries(require('./premium.json')));
-  var Statistics = require('./statistics.json');
+  let PremiumGuilds = new Map(Object.entries(require('./premium.json')));
+  const Statistics = require('./statistics.json');
 
   const SchemaTypes = Mongoose.Schema.Types;
   const Types = Mongoose.Types;
@@ -78,17 +79,17 @@
 
   const PrefixLength = Prefix.length;
 
-  var ErrorChannel;
-  var LogError = function () {
+  let ErrorChannel;
+  const LogError = function () {
     const defaultLog = () => console.error.apply(console.error, arguments);
 
     if (ErrorChannel != null) ErrorChannel.send('```\n' + Util.inspect(arguments.length > 1 ? arguments : arguments[0]).substr(0, 1992) + '\n```').catch(defaultLog);
     else defaultLog();
   };
 
-  var Me;
-  var Shard;
-  var ShardIdPrefix;
+  let Me;
+  let Shard;
+  let ShardIdPrefix;
   DiscordClient.on('ready', async () => {
     Me = DiscordClient.user;
     console.log(`Logged in as ${Me.tag}!`);
@@ -104,13 +105,13 @@
     DiscordClient.on('error', LogError);
   });
 
-  var Helps = new Map();
-  var Images = { anipics: [], animap: new Map() };
+  let Helps = new Map();
+  const Images = { anipics: [], animap: new Map() };
 
   async function LoadHelp() {
     Helps = new Map(Object.entries(JSON.parse(await Fs.readFile('help.json', 'utf8'))).map(([comm, help]) => [comm, help.replace(/\$PREFIX/g, Prefix)]));
   }
-  LoadHelp();
+  await LoadHelp();
   const ReloadHelpCommand = async (message) => {
     if (!IsDeveloper(message)) return;
     await LoadHelp();
@@ -133,7 +134,7 @@
     Shard.broadcastEval((client, { guildId }) => client.PremiumGuilds.set(guildId, 1), { context: { guildId } });
     try {
       await Fs.writeFile('premium.json', JSON.stringify(Object.fromEntries(PremiumGuilds), null, '\t'));
-      React(message, ConfirmEmoji);
+      await React(message, ConfirmEmoji);
     } catch (err) {
       LogError(err);
     }
@@ -150,7 +151,7 @@
     Shard.broadcastEval((client, { guildId }) => client.PremiumGuilds.delete(guildId), { context: { guildId } });
     try {
       await Fs.writeFile('premium.json', JSON.stringify(Object.fromEntries(PremiumGuilds), null, '\t'));
-      React(message, ConfirmRemoveEmoji);
+      await React(message, ConfirmRemoveEmoji);
     } catch (err) {
       LogError(err);
     }
@@ -165,7 +166,7 @@
     Images.animap = new Map(Images.anipics.map((name, i) => [name.toLowerCase(), i]));
     //Images.anipics.sort();
   }
-  LoadImages();
+  await LoadImages();
   const ReloadImagesCommand = async (message) => {
     if (!IsDeveloper(message)) return;
     await LoadImages();
@@ -364,12 +365,13 @@
 
     if (await User.exists({ _id: personId })) return;
 
-    User.updateOne({ _id: personId }, push, { upsert: true }).exec();
+    await User.updateOne({ _id: personId }, push, { upsert: true }).exec();
   }
 
-  var RelationshipRequests = new Map();
-  var ShipRequests = new Map();
-  var RelationshipRequestMessages = new Map();
+  const RelationshipRequests = new Map();
+  const ShipRequests = new Map();
+  const RelationshipRequestMessages = new Map();
+
   function DeleteRelationshipRequest(messageId, timeout) {
     let request = RelationshipRequestMessages.get(messageId);
     if (request === undefined) return;
@@ -476,7 +478,7 @@
                     `<@${mentionId}>, you are ${initiatorName}'s ${typeName} now!\nWould you like them to be your ${selfTypeName + (type === selfType ? ' too' : '')}?`,
                     true
                   );
-                  AddYesNoReactions(requestMessage);
+                  await AddYesNoReactions(requestMessage);
                   RelationshipRequestMessages.set(requestMessage.id, request);
                   request.m = requestMessage;
                   request.for = mentionId;
@@ -525,7 +527,7 @@
 
     command = command.substr(commandBase.length + 1).trim();
 
-    let types = command.split(MentionsArrowsRegex).filter((x) => x != '');
+    let types = command.split(MentionsArrowsRegex).filter((x) => x !== '');
     if (types.length !== 2) {
       Reply(
         message,
@@ -551,7 +553,7 @@
       if (type1 === type2) msg = `Wouldn't it be nice if you were eachother's ${type1Name}?`;
       else msg = `Would you like to be ${type1Name} and ${type2Name}? (<@${mentions[0]}> ${type1Name}, <@${mentions[1]}> ${type2Name})`;
       let requestMessage = await Reply(message, `<@${mentions[0]}> <@${mentions[1]}>, ${msg}`, true);
-      AddYesNoReactions(requestMessage);
+      await AddYesNoReactions(requestMessage);
       RelationshipRequestMessages.set(requestMessage.id, request);
       request.m = requestMessage;
       request.for = mentions[0];
@@ -754,8 +756,8 @@
     }
   };
 
-  var ManagerCommands = new Map();
-  var ManagerMsg = (msg) => {
+  const ManagerCommands = new Map();
+  const ManagerMsg = (msg) => {
     let commandId = msg[0];
     let result = msg[1];
     let resolve = ManagerCommands.get(commandId);
@@ -767,7 +769,8 @@
   };
 
   //const ManagerCommandPromise = (commandId) => new Promise((resolve) => ManagerCommands.set(commandId, resolve));
-  var ManagerCommandCounter = 0;
+  let ManagerCommandCounter = 0;
+
   function ManagerCommand(type, ...args) {
     let commandId = ShardIdPrefix + (ManagerCommandCounter++).toString(32);
     let managerPromise = new Promise((resolve) => ManagerCommands.set(commandId, resolve));
@@ -792,7 +795,7 @@
     }
   }
 
-  const TreeDepthRegex = /(?:[^\d]|^)(\d)(?:(\.[1-9])|[^\d]|$)/;
+  const TreeDepthRegex = /(?:\D|^)(\d)(?:(\.[1-9])|\D|$)/;
   const RelationshipGraphCommand = async (message, command, commandBase) => {
     let premium = IsPremium(message);
     let slot = await TakeRenderSlot(premium, message);
@@ -883,10 +886,10 @@
         fileName
       );
       let graphvizError = '';
-      graphviz.stderr.on('data', (data) => {
+      Graphviz.stderr.on('data', (data) => {
         graphvizError += data;
       });
-      graphviz.on('exit', async (code) => {
+      Graphviz.on('exit', async (code) => {
         if (code !== 0) {
           LogError({ 'GRAPHVIZ ERROR': graphvizError });
           await Reply(message, 'There was an error rendering the graph');
@@ -942,7 +945,7 @@
   }
 
   const SharpOptions = { limitInputPixels: 4000000 };
-  var PicNameRegex = /[\w-]+/;
+  const PicNameRegex = /[\w-]+/;
   const PictureEditCommand = async (message, command, commandBase, pictureName) => {
     let imageCount = Images.anipics.length;
     if (imageCount === 0) return;
@@ -1255,7 +1258,7 @@
 
           Reply(message, `Successfully uploaded with filename \`${fileName}\``).catch(LogError);
 
-          PictureEditCommand(message, command, commandBase, fileName);
+          await PictureEditCommand(message, command, commandBase, fileName);
         } catch (err) {
           LogError(err);
         } finally {
@@ -1297,7 +1300,7 @@
 
           Reply(message, `Successfully uploaded with filename \`${fileName}\``).catch(LogError);
 
-          PictureEditCommand(message, command, commandBase, fileName);
+          await PictureEditCommand(message, command, commandBase, fileName);
         } catch (err) {
           LogError(err);
         } finally {
@@ -1682,7 +1685,7 @@
     ['invite', (message) => Help(message, 'invite')],
   ]);
 
-  var RateMeasurements = new Map();
+  const RateMeasurements = new Map();
   const ClearRate = (id) => {
     RateMeasurements.delete(id);
   };
@@ -1778,7 +1781,7 @@
 
   Object.assign(DiscordClient, { LogError, ManagerMsg, PremiumGuilds, Statistics, Images });
 
-  var StatisticsChanged = false;
+  StatisticsChanged = false;
   setInterval(() => {
     if (StatisticsChanged) {
       StatisticsChanged = false;
@@ -1788,9 +1791,8 @@
 
   //Make sure there is no leftover junk
   Fs.readdir('graphs').then((files) => files.map((filename) => Fs.unlink(`graphs/${filename}`)));
-
-  const dbl = new (require('dblapi.js'))(process.env.DBLTOKEN, DiscordClient);
-  DiscordClient.login(process.env.TOKEN);
+  new (require('dblapi.js'))(process.env.DBLTOKEN, DiscordClient);
+  await DiscordClient.login(process.env.TOKEN);
 
   // Restart function
   async function restartBot() {
