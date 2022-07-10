@@ -82,4 +82,4 @@ manager.on('shardCreate', (shard) => {
   console.log(`Launched shard ${shard.id}`);
   shard.on('message', (message) => ShardMessage(shard, message));
 });
-manager.spawn().then(r => console.log(`Launched ${r.length} shards`));
+manager.spawn().then((r) => console.log(`Launched ${r.length} shards`));
